@@ -1,0 +1,3 @@
+tokenbot 8193710506:AAG8oEAKDwLba487Xm0qsMKcmbkYhvO0CEE
+tokenperonsal 7592b54a8227106c87a45cc744f42097 (api_hash)
+28311458 (api_id)
