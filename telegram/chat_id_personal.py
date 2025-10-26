@@ -3,10 +3,12 @@ api_id = 28311458
 api_hash = "7592b54a8227106c87a45cc744f42097" 
 app = Client("my_account", api_id=api_id, api_hash=api_hash)
 usernames = [
-    "@huch_hernandez",
+    # "@huch_hernandez",
+    # '@ranntharath'
     # '@Watsuub'
     # '@ounkoemtong' 
     # '@kyros123456789'
+    
 ]
 with app:
     me = app.get_me()

@@ -10,13 +10,15 @@ app = Client("my_account", api_id=api_id, api_hash=api_hash)
 
 chat_ids = [
     # 7106247750
-    1373268619
+    # 1373268619
+    # 1316815720
+    -1003174944925
 ]
 word=input('Enter your message: ')
-# Safe parameters (adjust as needed)
-MIN_DELAY = 1.5      # minimum seconds between messages
-MAX_DELAY = 4.0      # maximum seconds (jitter)
-MAX_RETRIES = 3      # retry attempts for transient errors
+
+MIN_DELAY = 1.5      
+MAX_DELAY = 4.0      
+MAX_RETRIES = 3      
 
 async def safe_send(chat_id, text):
     for attempt in range(1, MAX_RETRIES + 1):
