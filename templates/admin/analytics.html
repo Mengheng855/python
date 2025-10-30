@@ -1,0 +1,901 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Analytics - NEXUS Admin{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+        :root {
+            --admin-primary: #1a1a1a;
+            --admin-secondary: #2d3748;
+            --admin-accent: #4299e1;
+            --admin-success: #48bb78;
+            --admin-warning: #ed8936;
+            --admin-danger: #f56565;
+            --admin-light: #f7fafc;
+            --admin-dark: #1a202c;
+            --admin-border: #e2e8f0;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--admin-light);
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: var(--transition);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-logo i {
+            font-size: 1.75rem;
+            color: var(--admin-accent);
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-menu-item {
+            margin: 0.25rem 0;
+        }
+
+        .sidebar-menu-link {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu-link:hover,
+        .sidebar-menu-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--admin-accent);
+        }
+
+        .sidebar-menu-link i {
+            font-size: 1.25rem;
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: var(--transition);
+        }
+
+        .admin-header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--admin-border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--admin-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--admin-dark);
+            margin: 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Analytics Styles */
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .analytics-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary-custom {
+            background: var(--admin-accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary-custom:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary-custom {
+            background: white;
+            color: var(--admin-secondary);
+            border: 2px solid var(--admin-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary-custom:hover {
+            background: var(--admin-light);
+            border-color: var(--admin-secondary);
+        }
+
+        /* Key Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--admin-border);
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .metric-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .metric-icon.primary { background: rgba(66, 153, 225, 0.1); color: var(--admin-accent); }
+        .metric-icon.success { background: rgba(72, 187, 120, 0.1); color: var(--admin-success); }
+        .metric-icon.warning { background: rgba(237, 137, 54, 0.1); color: var(--admin-warning); }
+        .metric-icon.danger { background: rgba(245, 101, 101, 0.1); color: var(--admin-danger); }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--admin-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .metric-change.positive {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--admin-success);
+        }
+
+        .metric-change.negative {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--admin-danger);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--admin-border);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--admin-dark);
+            margin: 0;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--admin-border);
+            background: white;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chart-btn:hover {
+            background: var(--admin-light);
+        }
+
+        .chart-btn.active {
+            background: var(--admin-accent);
+            color: white;
+            border-color: var(--admin-accent);
+        }
+
+        /* Detailed Analytics */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--admin-border);
+        }
+
+        .analytics-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .analytics-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--admin-dark);
+            margin: 0;
+        }
+
+        .analytics-metric {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--admin-accent);
+            margin-bottom: 1rem;
+        }
+
+        .analytics-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .analytics-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .analytics-item:last-child {
+            border-bottom: none;
+        }
+
+        .analytics-item-label {
+            font-size: 0.875rem;
+            color: var(--admin-dark);
+        }
+
+        .analytics-item-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--admin-secondary);
+        }
+
+        .analytics-item-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--admin-light);
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .analytics-item-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--admin-accent), var(--admin-success));
+            border-radius: 4px;
+        }
+
+        /* Top Products Table */
+        .top-products-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--admin-border);
+            grid-column: span 2;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table th,
+        .products-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .products-table th {
+            background: var(--admin-light);
+            font-weight: 600;
+            color: var(--admin-dark);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .products-table tr:hover {
+            background: rgba(66, 153, 225, 0.02);
+        }
+
+        .product-rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--admin-accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: var(--admin-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-details h6 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--admin-dark);
+            margin: 0;
+        }
+
+        .product-details small {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+
+        /* Date Range Picker */
+        .date-range {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--admin-border);
+            margin-bottom: 2rem;
+        }
+
+        .date-inputs {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .date-input {
+            padding: 0.5rem;
+            border: 2px solid var(--admin-border);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .analytics-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .analytics-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-products-card {
+                grid-column: span 1;
+            }
+
+            .date-inputs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+                
+                <div class="analytics-header">
+                    <div>
+                        <h2 class="page-title">Analytics Dashboard</h2>
+                        <p class="text-muted mb-0">Comprehensive insights into your business performance</p>
+                    </div>
+                    <div class="analytics-actions">
+                        <button class="btn-secondary-custom">
+                            <i class="bi bi-calendar me-2"></i>Last 30 Days
+                        </button>
+                        <button class="btn-primary-custom">
+                            <i class="bi bi-plus-circle me-2"></i>Custom Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Date Range -->
+                <div class="date-range">
+                    <div class="date-inputs">
+                        <label for="startDate">From:</label>
+                        <input type="date" id="startDate" class="date-input" value="2024-01-01">
+                        <label for="endDate">To:</label>
+                        <input type="date" id="endDate" class="date-input" value="2024-12-31">
+                        <button class="btn-primary-custom">
+                            <i class="bi bi-search me-2"></i>Apply Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon primary">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            <div class="metric-change positive">+15.3%</div>
+                        </div>
+                        <div class="metric-value">{{ total_views|default('245,678') }}</div>
+                        <div class="metric-label">Page Views</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon success">
+                                <i class="bi bi-mouse"></i>
+                            </div>
+                            <div class="metric-change positive">+8.7%</div>
+                        </div>
+                        <div class="metric-value">{{ unique_visitors|default('89,432') }}</div>
+                        <div class="metric-label">Unique Visitors</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon warning">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                            <div class="metric-change positive">+12.1%</div>
+                        </div>
+                        <div class="metric-value">{{ avg_session|default('4m 32s') }}</div>
+                        <div class="metric-label">Avg. Session Duration</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon danger">
+                                <i class="bi bi-arrow-down"></i>
+                            </div>
+                            <div class="metric-change negative">-2.4%</div>
+                        </div>
+                        <div class="metric-value">{{ bounce_rate|default('34.2%') }}</div>
+                        <div class="metric-label">Bounce Rate</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Traffic Overview</h3>
+                            <div class="chart-actions">
+                                <button class="chart-btn active" data-period="7d">7D</button>
+                                <button class="chart-btn" data-period="30d">30D</button>
+                                <button class="chart-btn" data-period="90d">90D</button>
+                            </div>
+                        </div>
+                        <canvas id="trafficChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Traffic Sources</h3>
+                        </div>
+                        <canvas id="sourcesChart" width="200" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Analytics -->
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3 class="analytics-title">Device Breakdown</h3>
+                        </div>
+                        <div class="analytics-metric">78.5%</div>
+                        <ul class="analytics-list">
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Desktop</span>
+                                <span class="analytics-item-value">45.2%</span>
+                            </li>
+                            <div class="analytics-item-bar">
+                                <div class="analytics-item-fill" style="width: 45.2%"></div>
+                            </div>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Mobile</span>
+                                <span class="analytics-item-value">33.3%</span>
+                            </li>
+                            <div class="analytics-item-bar">
+                                <div class="analytics-item-fill" style="width: 33.3%"></div>
+                            </div>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Tablet</span>
+                                <span class="analytics-item-value">21.5%</span>
+                            </li>
+                            <div class="analytics-item-bar">
+                                <div class="analytics-item-fill" style="width: 21.5%"></div>
+                            </div>
+                        </ul>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3 class="analytics-title">Top Pages</h3>
+                        </div>
+                        <ul class="analytics-list">
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">/products</span>
+                                <span class="analytics-item-value">24,532 views</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">/categories/smartphones</span>
+                                <span class="analytics-item-value">18,921 views</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">/</span>
+                                <span class="analytics-item-value">15,678 views</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">/about</span>
+                                <span class="analytics-item-value">12,345 views</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">/contact</span>
+                                <span class="analytics-item-value">8,932 views</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3 class="analytics-title">Geographic Data</h3>
+                        </div>
+                        <ul class="analytics-list">
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">United States</span>
+                                <span class="analytics-item-value">32.1%</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">United Kingdom</span>
+                                <span class="analytics-item-value">18.7%</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Germany</span>
+                                <span class="analytics-item-value">12.3%</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Canada</span>
+                                <span class="analytics-item-value">9.8%</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Australia</span>
+                                <span class="analytics-item-value">7.2%</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3 class="analytics-title">Conversion Funnel</h3>
+                        </div>
+                        <ul class="analytics-list">
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Visitors</span>
+                                <span class="analytics-item-value">100%</span>
+                            </li>
+                            <div class="analytics-item-bar">
+                                <div class="analytics-item-fill" style="width: 100%; background: var(--admin-accent);"></div>
+                            </div>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Product Views</span>
+                                <span class="analytics-item-value">78.5%</span>
+                            </li>
+                            <div class="analytics-item-bar">
+                                <div class="analytics-item-fill" style="width: 78.5%; background: var(--admin-warning);"></div>
+                            </div>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Add to Cart</span>
+                                <span class="analytics-item-value">45.2%</span>
+                            </li>
+                            <div class="analytics-item-bar">
+                                <div class="analytics-item-fill" style="width: 45.2%; background: var(--admin-success);"></div>
+                            </div>
+                            <li class="analytics-item">
+                                <span class="analytics-item-label">Purchases</span>
+                                <span class="analytics-item-value">12.8%</span>
+                            </li>
+                            <div class="analytics-item-bar">
+                                <div class="analytics-item-fill" style="width: 12.8%; background: var(--admin-danger);"></div>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Top Products Table -->
+                <div class="top-products-card">
+                    <div class="analytics-header">
+                        <h3 class="analytics-title">Top Performing Products</h3>
+                        <button class="btn-secondary-custom">
+                            <i class="bi bi-eye me-2"></i>View All
+                        </button>
+                    </div>
+
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th>Revenue</th>
+                                <th>Sales</th>
+                                <th>Conversion</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in top_products|default([]) %}
+                            <tr>
+                                <td>
+                                    <div class="product-rank">{{ loop.index }}</div>
+                                </td>
+                                <td>
+                                    <div class="product-info">
+                                        <div class="product-image">
+                                            {% if product.image %}
+                                            <img src="{{ product.image }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                                            {% else %}
+                                            <i class="bi bi-image" style="font-size: 1.25rem; color: #718096;"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="product-details">
+                                            <h6>{{ product.name }}</h6>
+                                            <small>{{ product.category }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${{ product.revenue|default('0') }}</td>
+                                <td>{{ product.sales|default('0') }}</td>
+                                <td>{{ product.conversion|default('0') }}%</td>
+                                <td>
+                                    <span class="metric-change positive" style="font-size: 0.75rem;">
+                                        <i class="bi bi-arrow-up"></i> {{ product.trend|default('0') }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                            <!-- Default products for demo -->
+                            {% if not top_products %}
+                            <tr>
+                                <td>
+                                    <div class="product-rank">1</div>
+                                </td>
+                                <td>
+                                    <div class="product-info">
+                                        <div class="product-image">
+                                            <img src="https://i.pinimg.com/1200x/aa/5e/b5/aa5eb5a473f10d73bbc621d16e24c5a6.jpg" alt="ProMax Ultra 5G" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                                        </div>
+                                        <div class="product-details">
+                                            <h6>ProMax Ultra 5G</h6>
+                                            <small>Smartphones</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>$45,230</td>
+                                <td>156</td>
+                                <td>12.8%</td>
+                                <td>
+                                    <span class="metric-change positive" style="font-size: 0.75rem;">
+                                        <i class="bi bi-arrow-up"></i> 15.3%
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="product-rank">2</div>
+                                </td>
+                                <td>
+                                    <div class="product-info">
+                                        <div class="product-image">
+                                            <i class="bi bi-image" style="font-size: 1.25rem; color: #718096;"></i>
+                                        </div>
+                                        <div class="product-details">
+                                            <h6>UltraBook Pro 15"</h6>
+                                            <small>Laptops</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>$32,450</td>
+                                <td>89</td>
+                                <td>9.2%</td>
+                                <td>
+                                    <span class="metric-change positive" style="font-size: 0.75rem;">
+                                        <i class="bi bi-arrow-up"></i> 8.7%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+{% endblock %}

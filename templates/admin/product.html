@@ -1,0 +1,1218 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Product Management - NEXUS Admin{% endblock %}
+
+{% block page_title %}Product Management{% endblock %}
+
+{% block extra_styles %}
+<style>
+    :root {
+        --admin-primary: #1a1a1a;
+        --admin-secondary: #2d3748;
+        --admin-accent: #4299e1;
+        --admin-success: #48bb78;
+        --admin-warning: #ed8936;
+        --admin-danger: #f56565;
+        --admin-light: #f7fafc;
+        --admin-dark: #1a202c;
+        --admin-border: #e2e8f0;
+        --sidebar-width: 280px;
+        --header-height: 70px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--admin-light);
+        overflow-x: hidden;
+    }
+
+    .admin-layout {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .admin-sidebar {
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+        color: white;
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        overflow-y: auto;
+        transition: var(--transition);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .sidebar-logo i {
+        font-size: 1.75rem;
+        color: var(--admin-accent);
+    }
+
+    .sidebar-menu {
+        padding: 1rem 0;
+    }
+
+    .sidebar-menu-item {
+        margin: 0.25rem 0;
+    }
+
+    .sidebar-menu-link {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: var(--transition);
+        border-left: 4px solid transparent;
+    }
+
+    .sidebar-menu-link:hover,
+    .sidebar-menu-link.active {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-left-color: var(--admin-accent);
+    }
+
+    .sidebar-menu-link i {
+        font-size: 1.25rem;
+        margin-right: 0.75rem;
+        width: 20px;
+    }
+
+    .admin-main {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        transition: var(--transition);
+    }
+
+    .admin-header {
+        height: var(--header-height);
+        background: white;
+        border-bottom: 1px solid var(--admin-border);
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: var(--admin-secondary);
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--admin-dark);
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .admin-content {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Product Management Styles */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-primary-custom {
+        background: var(--admin-accent);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-primary-custom:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary-custom {
+        background: white;
+        color: var(--admin-secondary);
+        border: 2px solid var(--admin-border);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-secondary-custom:hover {
+        background: var(--admin-light);
+        border-color: var(--admin-secondary);
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--admin-border);
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .stat-icon.primary {
+        background: rgba(66, 153, 225, 0.1);
+        color: var(--admin-accent);
+    }
+
+    .stat-icon.success {
+        background: rgba(72, 187, 120, 0.1);
+        color: var(--admin-success);
+    }
+
+    .stat-icon.warning {
+        background: rgba(237, 137, 54, 0.1);
+        color: var(--admin-warning);
+    }
+
+    .stat-icon.danger {
+        background: rgba(245, 101, 101, 0.1);
+        color: var(--admin-danger);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--admin-dark);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #718096;
+        font-weight: 500;
+    }
+
+    /* Products Grid */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .product-card-admin {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--admin-border);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .product-card-admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .product-image-admin {
+        height: 200px;
+        background: var(--admin-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .product-image-admin img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .product-placeholder {
+        width: 80px;
+        height: 120px;
+        background: linear-gradient(135deg, #e5e5e5 0%, #d5d5d5 100%);
+        border-radius: 8px;
+    }
+
+    .product-badge-admin {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: var(--admin-primary);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 4px;
+    }
+
+    .product-content {
+        padding: 1.5rem;
+    }
+
+    .product-category-admin {
+        font-size: 0.8125rem;
+        color: var(--admin-accent);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-name-admin {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--admin-dark);
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-price-admin {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .price-current-admin {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--admin-dark);
+    }
+
+    .price-old-admin {
+        font-size: 0.875rem;
+        color: #718096;
+        text-decoration: line-through;
+    }
+
+    .product-stock {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-bottom: 1rem;
+    }
+
+    .stock-low {
+        color: var(--admin-danger);
+        font-weight: 600;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn-admin {
+        flex: 1;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .action-btn-admin.edit {
+        background: rgba(66, 153, 225, 0.1);
+        color: var(--admin-accent);
+    }
+
+    .action-btn-admin.edit:hover {
+        background: var(--admin-accent);
+        color: white;
+    }
+
+    .action-btn-admin.delete {
+        background: rgba(245, 101, 101, 0.1);
+        color: var(--admin-danger);
+    }
+
+    .action-btn-admin.delete:hover {
+        background: var(--admin-danger);
+        color: white;
+    }
+
+    /* Filters and Search */
+    .filters-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--admin-border);
+        margin-bottom: 2rem;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--admin-dark);
+    }
+
+    .filter-select,
+    .filter-input {
+        padding: 0.75rem;
+        border: 2px solid var(--admin-border);
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: var(--transition);
+    }
+
+    .filter-select:focus,
+    .filter-input:focus {
+        border-color: var(--admin-accent);
+        outline: none;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    /* Bulk Actions */
+    .bulk-actions {
+        background: var(--admin-light);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .bulk-checkbox {
+        width: 18px;
+        height: 18px;
+    }
+
+    .bulk-text {
+        font-size: 0.875rem;
+        color: var(--admin-dark);
+        font-weight: 600;
+    }
+
+    .bulk-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: auto;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+        color: white;
+        border-bottom: none;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .modal-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .modal-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+        position: relative;
+        z-index: 1;
+        margin: 0;
+    }
+
+
+    .modal-body {
+        padding: 1.5rem;
+        background: var(--admin-light);
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .form-label {
+        color: var(--admin-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 2px solid var(--admin-border);
+        border-radius: 10px;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--admin-accent);
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        outline: none;
+    }
+
+    .input-group-text {
+        background: var(--admin-light);
+        border: 2px solid var(--admin-border);
+        border-right: none;
+        color: var(--admin-secondary);
+        font-weight: 600;
+    }
+
+    .form-control:focus + .input-group-text,
+    .input-group .form-control:focus {
+        border-color: var(--admin-accent);
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:focus {
+        border-left: 2px solid var(--admin-accent);
+    }
+
+    .modal-footer {
+        background: white;
+        border-top: 1px solid var(--admin-border);
+        padding: 1.5rem 2rem;
+        gap: 1rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: var(--transition);
+        border: none;
+        min-width: 120px;
+    }
+
+    .modal-footer .btn-secondary {
+        background: var(--admin-light);
+        color: var(--admin-secondary);
+        border: 2px solid var(--admin-border);
+    }
+
+    .modal-footer .btn-secondary:hover {
+        background: var(--admin-border);
+        transform: translateY(-1px);
+    }
+
+    .modal-footer .btn-primary {
+        background: var(--admin-accent);
+        color: white;
+    }
+
+    .modal-footer .btn-primary:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    }
+
+    /* Form Sections */
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--admin-border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--admin-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-section-title i {
+        color: var(--admin-accent);
+        font-size: 1.1rem;
+    }
+
+    /* File Input Styling */
+    .form-control[type="file"] {
+        padding: 0.5rem;
+    }
+
+    .form-control[type="file"]::file-selector-button {
+        background: var(--admin-accent);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-right: 1rem;
+    }
+
+    .form-control[type="file"]::file-selector-button:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+    }
+
+    /* Textarea Styling */
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* Required Field Indicator */
+    .form-label::after {
+        content: ' *';
+        color: var(--admin-danger);
+        font-weight: 700;
+    }
+
+    .form-label:not([for="oldPrice"]):not([for="productDescription"]):not([for="file"])::after {
+        content: ' *';
+        color: var(--admin-danger);
+        font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            transform: translateX(-100%);
+        }
+
+        .admin-sidebar.show {
+            transform: translateX(0);
+        }
+
+        .admin-main {
+            margin-left: 0;
+        }
+
+        .menu-toggle {
+            display: block;
+        }
+
+        .page-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .page-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .product-actions {
+            flex-direction: column;
+        }
+
+        .modal-dialog {
+            margin: 1rem;
+            max-width: none;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 1.5rem;
+        }
+
+        .form-section {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Manage Products</h2>
+        <p class="text-muted mb-0">Add,
+            edit,
+            and manage your product inventory</p>
+    </div>
+    <div class="page-actions">
+        <button class="btn-secondary-custom"><i class="bi bi-funnel me-2"></i>Filter
+        </button>
+        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <i class="bi bi-plus-circle me-2 "></i>Add Product
+        </button>
+    </div>
+</div>
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon primary"><i class="bi bi-box-seam"></i></div>
+        </div>
+        <div class="stat-value">{{ total_products|default('247') }}</div>
+        <div class="stat-label">Total Products</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
+        </div>
+        <div class="stat-value">{{ active_products|default('189') }}</div>
+        <div class="stat-label">Active Products</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon warning"><i class="bi bi-exclamation-triangle"></i></div>
+        </div>
+        <div class="stat-value">{{ low_stock_products|default('23') }}</div>
+        <div class="stat-label">Low Stock</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon danger"><i class="bi bi-x-circle"></i></div>
+        </div>
+        <div class="stat-value">{{ out_of_stock|default('8') }}</div>
+        <div class="stat-label">Out of Stock</div>
+    </div>
+</div>
+<!-- Filters Section -->
+<div class="filters-section">
+    <div class="filters-grid">
+        <div class="filter-group"><label class="filter-label">Search Products</label><input type="text"
+                class="filter-input" placeholder="Search by name, SKU..."></div>
+        <div class="filter-group"><label class="filter-label">Category</label><select class="filter-select">
+                <option value="">All Categories</option>
+                <option value="smartphones">Smartphones</option>
+                <option value="laptops">Laptops</option>
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('productForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+
+    // Real-time validation feedback
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                validateField(this);
+            }
+        });
+    });
+
+    // Price validation - ensure old price is higher than current price
+    const currentPriceInput = document.getElementById('currentPrice');
+    const oldPriceInput = document.getElementById('oldPrice');
+
+    function validatePrices() {
+        const currentPrice = parseFloat(currentPriceInput.value) || 0;
+        const oldPrice = parseFloat(oldPriceInput.value) || 0;
+
+        if (oldPrice > 0 && oldPrice <= currentPrice) {
+            oldPriceInput.classList.add('is-invalid');
+            oldPriceInput.nextElementSibling.textContent = 'Old price must be higher than current price';
+            return false;
+        } else {
+            oldPriceInput.classList.remove('is-invalid');
+            oldPriceInput.nextElementSibling.textContent = 'Leave empty if no discount pricing';
+            return true;
+        }
+    }
+
+    currentPriceInput.addEventListener('input', validatePrices);
+    oldPriceInput.addEventListener('input', validatePrices);
+
+    // File upload preview and validation
+    const fileInput = document.getElementById('file');
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPG, PNG, or GIF)');
+                this.value = '';
+                return;
+            }
+
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                this.value = '';
+                return;
+            }
+        }
+    });
+
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        // Validate all required fields
+        let isValid = true;
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+
+        // Validate prices
+        if (!validatePrices()) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Adding Product...';
+    });
+
+    function validateField(field) {
+        const value = field.value.trim();
+        let isValid = true;
+        let message = '';
+
+        // Remove existing validation classes
+        field.classList.remove('is-valid', 'is-invalid');
+
+        // Check if field is required and empty
+        if (field.hasAttribute('required') && !value) {
+            isValid = false;
+            message = 'This field is required';
+        }
+
+        // Specific validations
+        switch (field.name) {
+            case 'name':
+                if (value && value.length < 3) {
+                    isValid = false;
+                    message = 'Product name must be at least 3 characters';
+                }
+                break;
+            case 'price_current':
+                if (value && (parseFloat(value) < 0 || isNaN(parseFloat(value)))) {
+                    isValid = false;
+                    message = 'Please enter a valid price';
+                }
+                break;
+            case 'stock':
+                if (value && (parseInt(value) < 0 || isNaN(parseInt(value)))) {
+                    isValid = false;
+                    message = 'Stock must be a valid number';
+                }
+                break;
+        }
+
+        // Apply validation styling
+        if (isValid && value) {
+            field.classList.add('is-valid');
+        } else if (!isValid) {
+            field.classList.add('is-invalid');
+        }
+
+        // Update or create feedback message
+        let feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            field.parentNode.appendChild(feedback);
+        }
+        feedback.textContent = message;
+
+        return isValid;
+    }
+
+    // Removed SKU auto-generation as requested
+
+    // Reset form when modal is closed
+    const modal = document.getElementById('exampleModal');
+    modal.addEventListener('hidden.bs.modal', function() {
+        form.reset();
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+
+        // Clear validation classes
+        form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
+            el.classList.remove('is-valid', 'is-invalid');
+        });
+    });
+});
+</script>
+                <option value="audio">Audio</option>
+                <option value="wearables">Wearables</option>
+                <option value="cameras">Cameras</option>
+            </select></div>
+        <div class="filter-group"><label class="filter-label">Status</label><select class="filter-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="low_stock">Low Stock</option>
+                <option value="out_of_stock">Out of Stock</option>
+            </select></div>
+        <div class="filter-actions"><button class="btn-secondary-custom"><i class="bi bi-x-circle me-2"></i>Clear
+            </button><button class="btn-primary-custom"><i class="bi bi-search me-2"></i>Search </button></div>
+    </div>
+</div>
+<!-- Bulk Actions -->
+<div class="bulk-actions"><input type="checkbox" class="bulk-checkbox" id="selectAll"><label for="selectAll"
+        class="bulk-text">Select All</label>
+    <div class="bulk-buttons"><button class="btn-secondary-custom"><i class="bi bi-tag me-2"></i>Bulk
+            Edit </button><button class="btn-secondary-custom"><i class="bi bi-trash me-2"></i>Delete
+            Selected </button></div>
+</div>
+<!-- Products Grid -->
+<div class="products-grid">
+    {% for product in products|default([]) %}
+
+    <div class="product-card-admin">
+        <div class="product-image-admin">
+            {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+            <div class="product-placeholder"></div>
+            {% endif %}
+            {% if product.badge %}
+            <span class="product-badge-admin">
+                {{ product.badge }}
+            </span>
+            {% endif %}
+        </div>
+        <div class="product-content">
+            <div class="product-category-admin">
+                {{ product.category }}
+            </div>
+            <h6 class="product-name-admin">
+                {{ product.name }}
+            </h6>
+            <div class="product-price-admin"><span class="price-current-admin">
+                    {{ product.price_current }}
+                </span>
+                {% if product.price_old %}
+                <span class="price-old-admin">
+                    {{ product.price_old }}
+                </span>
+                {% endif %}
+
+            </div>
+            <div class="product-stock {% if product.stock <= 10 %}stock-low{% endif %}">Stock: {{
+                product.stock|default('50') }}
+
+                units </div>
+            <div class="product-actions"><button class="action-btn-admin edit"><i class="bi bi-pencil"></i>Edit
+                </button><button class="action-btn-admin delete"><i class="bi bi-trash"></i>Delete </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Default products for demo --> {% if not products %}
+
+    <div class="product-card-admin">
+        <div class="product-image-admin"><img
+                src="https://i.pinimg.com/1200x/aa/5e/b5/aa5eb5a473f10d73bbc621d16e24c5a6.jpg"
+                alt="ProMax Ultra 5G"><span class="product-badge-admin">New</span></div>
+        <div class="product-content">
+            <div class="product-category-admin">Smartphones</div>
+            <h6 class="product-name-admin">ProMax Ultra 5G</h6>
+            <div class="product-price-admin"><span class="price-current-admin">$999</span><span
+                    class="price-old-admin">$1,
+                    299</span></div>
+            <div class="product-stock">Stock: 25 units</div>
+            <div class="product-actions"><button class="action-btn-admin edit"><i class="bi bi-pencil"></i>Edit
+                </button><button class="action-btn-admin delete"><i class="bi bi-trash"></i>Delete </button>
+            </div>
+        </div>
+    </div>
+    <div class="product-card-admin">
+        <div class="product-image-admin">
+            <div class="product-placeholder"></div>
+        </div>
+        <div class="product-content">
+            <div class="product-category-admin">Laptops</div>
+            <h6 class="product-name-admin">UltraBook Pro 15"</h6>
+            <div class="product-price-admin"><span class="price-current-admin">$1,
+                    799</span></div>
+            <div class="product-stock stock-low">Stock: 5 units</div>
+            <div class="product-actions"><button class="action-btn-admin edit"><i class="bi bi-pencil"></i>Edit
+                </button><button class="action-btn-admin delete"><i class="bi bi-trash"></i>Delete </button>
+            </div>
+        </div>
+    </div>
+    <div class="product-card-admin">
+        <div class="product-image-admin">
+            <div class="product-placeholder"></div><span class="product-badge-admin">Sale</span>
+        </div>
+        <div class="product-content">
+            <div class="product-category-admin">Audio</div>
+            <h6 class="product-name-admin">SoundMax Pro ANC</h6>
+            <div class="product-price-admin"><span class="price-current-admin">$349</span><span
+                    class="price-old-admin">$449</span></div>
+            <div class="product-stock">Stock: 45 units</div>
+            <div class="product-actions"><button class="action-btn-admin edit"><i class="bi bi-pencil"></i>Edit
+                </button><button class="action-btn-admin delete"><i class="bi bi-trash"></i>Delete </button>
+            </div>
+        </div>
+    </div> {% endif %}
+</div>
+</div>
+
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i>Add New Product
+                </h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="productForm" method="POST" action="/admin/products/add" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Basic Information Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-info-circle"></i>
+                            Basic Information
+                        </div>
+                        <div class="row g-3">
+                            <!-- Product Name -->
+                            <div class="col-md-6">
+                                <label for="productName" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" id="productName" name="productName" required
+                                       placeholder="Enter product name">
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label for="productCategory" class="form-label">Category</label>
+                                <select class="form-select" id="productCategory" name="category" required>
+                                    <option value="" selected disabled>----Select Category----</option>
+                                    <option value="smartphones">📱 Smartphones</option>
+                                    <option value="laptops">💻 Laptops</option>
+                                    <option value="audio">🎧 Audio</option>
+                                    <option value="wearables">⌚ Wearables</option>
+                                    <option value="cameras">📷 Cameras</option>
+                                    <option value="accessories">🔌 Accessories</option>
+                                </select>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-12">
+                                <label for="productStatus" class="form-label">Status</label>
+                                <select class="form-select" id="productStatus" name="status" required>
+                                    <option value="1">✅ Active</option>
+                                    <option value="0">⏸️ Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-cash"></i>
+                            Pricing Information
+                        </div>
+                        <div class="row g-3">
+                            <!-- Current Price -->
+                            <div class="col-md-6">
+                                <label for="price" class="form-label">Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="price" name="price"
+                                           step="0.01" min="0" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <!-- Old Price -->
+                            <div class="col-md-6">
+                                <label for="discount" class="form-label">Discount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">%</span>
+                                    <input type="number" class="form-control" id="discount" name="discount"
+                                           step="0.01" min="0" placeholder="Leave empty if no discount">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-box-seam"></i>
+                            Inventory & Media
+                        </div>
+                        <div class="row g-3">
+                            <!-- Stock -->
+                            <div class="col-12">
+                                <label for="productStock" class="form-label">Stock Quantity</label>
+                                <input type="number" class="form-control" id="productStock" name="stock"
+                                       min="0" required placeholder="0">
+                            </div>
+                            <!-- Image Upload -->
+                            <div class="col-12">
+                                <label for="file" class="form-label">Product Image</label>
+                                <input type="file" class="form-control" id="file" name="file">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-file-text"></i>
+                            Description
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="productDescription" class="form-label">Product Description</label>
+                                <textarea class="form-control" id="productDescription" name="description"
+                                          rows="3" placeholder="Describe your product features, specifications, and benefits..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i>Add Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

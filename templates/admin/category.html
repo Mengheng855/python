@@ -1,0 +1,892 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Category Management - NEXUS Admin{% endblock %}
+
+{% block page_title %}Category Management{% endblock %}
+
+{% block extra_styles %}
+<style>
+    :root {
+        --admin-primary: #1a1a1a;
+        --admin-secondary: #2d3748;
+        --admin-accent: #4299e1;
+        --admin-success: #48bb78;
+        --admin-warning: #ed8936;
+        --admin-danger: #f56565;
+        --admin-light: #f7fafc;
+        --admin-dark: #1a202c;
+        --admin-border: #e2e8f0;
+        --sidebar-width: 280px;
+        --header-height: 70px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--admin-light);
+        overflow-x: hidden;
+    }
+
+    .admin-layout {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .admin-sidebar {
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+        color: white;
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        overflow-y: auto;
+        transition: var(--transition);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .sidebar-logo i {
+        font-size: 1.75rem;
+        color: var(--admin-accent);
+    }
+
+    .sidebar-menu {
+        padding: 1rem 0;
+    }
+
+    .sidebar-menu-item {
+        margin: 0.25rem 0;
+    }
+
+    .sidebar-menu-link {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: var(--transition);
+        border-left: 4px solid transparent;
+    }
+
+    .sidebar-menu-link:hover,
+    .sidebar-menu-link.active {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-left-color: var(--admin-accent);
+    }
+
+    .sidebar-menu-link i {
+        font-size: 1.25rem;
+        margin-right: 0.75rem;
+        width: 20px;
+    }
+
+    .admin-main {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        transition: var(--transition);
+    }
+
+    .admin-header {
+        height: var(--header-height);
+        background: white;
+        border-bottom: 1px solid var(--admin-border);
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: var(--admin-secondary);
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--admin-dark);
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .admin-content {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Category Management Styles */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-primary-custom {
+        background: var(--admin-accent);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-primary-custom:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary-custom {
+        background: white;
+        color: var(--admin-secondary);
+        border: 2px solid var(--admin-border);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-secondary-custom:hover {
+        background: var(--admin-light);
+        border-color: var(--admin-secondary);
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--admin-border);
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .stat-icon.primary {
+        background: rgba(66, 153, 225, 0.1);
+        color: var(--admin-accent);
+    }
+
+    .stat-icon.success {
+        background: rgba(72, 187, 120, 0.1);
+        color: var(--admin-success);
+    }
+
+    .stat-icon.warning {
+        background: rgba(237, 137, 54, 0.1);
+        color: var(--admin-warning);
+    }
+
+    .stat-icon.danger {
+        background: rgba(245, 101, 101, 0.1);
+        color: var(--admin-danger);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--admin-dark);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #718096;
+        font-weight: 500;
+    }
+
+    /* Categories Table */
+    .categories-table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--admin-border);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .categories-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .categories-table thead th {
+        background: var(--admin-light);
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--admin-dark);
+        border-bottom: 2px solid var(--admin-border);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .categories-table tbody td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
+        font-size: 0.875rem;
+        color: var(--admin-dark);
+    }
+
+    .categories-table tbody tr:hover {
+        background: var(--admin-light);
+    }
+
+    .category-id {
+        font-weight: 600;
+        color: var(--admin-accent);
+    }
+
+    .category-name {
+        font-weight: 600;
+        color: var(--admin-dark);
+    }
+
+    .category-created {
+        color: #718096;
+    }
+
+    .category-updated {
+        color: #718096;
+    }
+
+    .category-username {
+        font-weight: 500;
+    }
+
+    .category-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .category-status.active {
+        background: rgba(72, 187, 120, 0.1);
+        color: var(--admin-success);
+    }
+
+    .category-status.inactive {
+        background: rgba(245, 101, 101, 0.1);
+        color: var(--admin-danger);
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn-admin {
+        padding: 0.375rem 0.75rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .action-btn-admin.edit {
+        background: rgba(66, 153, 225, 0.1);
+        color: var(--admin-accent);
+    }
+
+    .action-btn-admin.edit:hover {
+        background: var(--admin-accent);
+        color: white;
+    }
+
+    .action-btn-admin.delete {
+        background: rgba(245, 101, 101, 0.1);
+        color: var(--admin-danger);
+    }
+
+    .action-btn-admin.delete:hover {
+        background: var(--admin-danger);
+        color: white;
+    }
+
+    /* Filters and Search */
+    .filters-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--admin-border);
+        margin-bottom: 2rem;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--admin-dark);
+    }
+
+    .filter-select,
+    .filter-input {
+        padding: 0.75rem;
+        border: 2px solid var(--admin-border);
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: var(--transition);
+    }
+
+    .filter-select:focus,
+    .filter-input:focus {
+        border-color: var(--admin-accent);
+        outline: none;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    /* Bulk Actions */
+    .bulk-actions {
+        background: var(--admin-light);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .bulk-checkbox {
+        width: 18px;
+        height: 18px;
+    }
+
+    .bulk-text {
+        font-size: 0.875rem;
+        color: var(--admin-dark);
+        font-weight: 600;
+    }
+
+    .bulk-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: auto;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+        color: white;
+        border-bottom: none;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .modal-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .modal-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+        position: relative;
+        z-index: 1;
+        margin: 0;
+    }
+
+
+
+
+    .modal-body {
+        padding: 1.5rem;
+        background: var(--admin-light);
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .form-label {
+        color: var(--admin-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 2px solid var(--admin-border);
+        border-radius: 10px;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--admin-accent);
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        outline: none;
+    }
+
+    .input-group-text {
+        background: var(--admin-light);
+        border: 2px solid var(--admin-border);
+        border-right: none;
+        color: var(--admin-secondary);
+        font-weight: 600;
+    }
+
+    .form-control:focus+.input-group-text,
+    .input-group .form-control:focus {
+        border-color: var(--admin-accent);
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:focus {
+        border-left: 2px solid var(--admin-accent);
+    }
+
+    .modal-footer {
+        background: white;
+        border-top: 1px solid var(--admin-border);
+        padding: 1.5rem 2rem;
+        gap: 1rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: var(--transition);
+        border: none;
+        min-width: 120px;
+    }
+
+    .modal-footer .btn-secondary {
+        background: var(--admin-light);
+        color: var(--admin-secondary);
+        border: 2px solid var(--admin-border);
+    }
+
+    .modal-footer .btn-secondary:hover {
+        background: var(--admin-border);
+        transform: translateY(-1px);
+    }
+
+    .modal-footer .btn-primary {
+        background: var(--admin-accent);
+        color: white;
+    }
+
+    .modal-footer .btn-primary:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    }
+
+    /* Form Sections */
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--admin-border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--admin-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-section-title i {
+        color: var(--admin-accent);
+        font-size: 1.1rem;
+    }
+
+    /* File Input Styling */
+    .form-control[type="file"] {
+        padding: 0.5rem;
+    }
+
+    .form-control[type="file"]::file-selector-button {
+        background: var(--admin-accent);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-right: 1rem;
+    }
+
+    .form-control[type="file"]::file-selector-button:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+    }
+
+    /* Textarea Styling */
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* Required Field Indicator */
+    .form-label::after {
+        content: ' *';
+        color: var(--admin-danger);
+        font-weight: 700;
+    }
+
+    .form-label[for="categoryUsername"]::after {
+        content: '';
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            transform: translateX(-100%);
+        }
+
+        .admin-sidebar.show {
+            transform: translateX(0);
+        }
+
+        .admin-main {
+            margin-left: 0;
+        }
+
+        .menu-toggle {
+            display: block;
+        }
+
+        .page-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .page-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .category-actions {
+            flex-direction: column;
+        }
+
+        .modal-dialog {
+            margin: 1rem;
+            max-width: none;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 1.5rem;
+        }
+
+        .form-section {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Manage Categories</h2>
+        <p class="text-muted mb-0">Add, edit, and manage your product categories</p>
+    </div>
+    <div class="page-actions">
+        <button class="btn-secondary-custom"><i class="bi bi-funnel me-2"></i>Filter</button>
+        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#categoryModal">
+            <i class="bi bi-plus-circle me-2"></i>Add Category
+        </button>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon primary"><i class="bi bi-grid"></i></div>
+        </div>
+        <div class="stat-value">{{ total_categories|default('12') }}</div>
+        <div class="stat-label">Total Categories</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
+        </div>
+        <div class="stat-value">{{ active_categories|default('10') }}</div>
+        <div class="stat-label">Active Categories</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon warning"><i class="bi bi-exclamation-triangle"></i></div>
+        </div>
+        <div class="stat-value">{{ empty_categories|default('2') }}</div>
+        <div class="stat-label">Empty Categories</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon danger"><i class="bi bi-x-circle"></i></div>
+        </div>
+        <div class="stat-value">{{ inactive_categories|default('1') }}</div>
+        <div class="stat-label">Inactive Categories</div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-section">
+    <div class="filters-grid">
+        <div class="filter-group">
+            <label class="filter-label">Search Categories</label>
+            <input type="text" class="filter-input" placeholder="Search by name...">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select class="filter-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button class="btn-secondary-custom"><i class="bi bi-x-circle me-2"></i>Clear</button>
+            <button class="btn-primary-custom"><i class="bi bi-search me-2"></i>Search</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Actions -->
+<div class="bulk-actions">
+    <input type="checkbox" class="bulk-checkbox" id="selectAllCategories">
+    <label for="selectAllCategories" class="bulk-text">Select All</label>
+    <div class="bulk-buttons">
+        <button class="btn-secondary-custom"><i class="bi bi-tag me-2"></i>Bulk Edit</button>
+        <button class="btn-secondary-custom"><i class="bi bi-trash me-2"></i>Delete Selected</button>
+    </div>
+</div>
+
+<!-- Categories Table -->
+<div class="categories-table-container">
+    <table class="categories-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Username</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in cate %}
+            <tr>
+                <td class="category-id">#{{ category[0] }}</td>
+                <td class="category-name">{{ category[1] }}</td>
+                <td class="category-created">{{ category[2] }}</td>
+                <td class="category-updated">{{ category[3] }}</td>
+                <td class="category-username">{{ category[4] }}</td>
+            
+                <td class="category-actions">
+                    <button class="action-btn-admin edit"><i class="bi bi-pencil"></i>Edit</button>
+                    <button class="action-btn-admin delete"><i class="bi bi-trash"></i>Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+
+            <!-- Default categories for demo -->
+            {% if not cate %}
+            <tr>
+                <td colspan="7" class="text-center py-4">
+                    <div class="alert alert-warning m-0" role="alert">
+                        <strong>No Category Found!</strong> Please add a category first.
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="categoryModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i>Add New Category
+                </h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form id="categoryForm" method="POST" action="/admin/category" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Basic Information Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            
+                            <label for="categoryName" class="form-label">Category Name</label>
+                        </div>
+                        <div class="row g-3">
+                            <!-- Category Name -->
+                            <div class="col-12">
+                                
+                                <input type="text" class="form-control" id="categoryName" name="cate_name" required
+                                    placeholder="Enter category name">
+                            </div>
+                        </div>
+                    </div>
+
+                   
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i>Add Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

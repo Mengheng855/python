@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - Premium Electronics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <span class="brand-icon">◆</span> NEXUS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#categories">Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-4">
+                    <button class="icon-btn" aria-label="Search">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <button class="icon-btn position-relative" aria-label="Cart">
+                        <i class="bi bi-bag"></i>
+                        <span class="cart-badge">0</span>
+                    </button>
+                    <div class="auth-buttons d-flex gap-2">
+                        {% if session.get('user_id') %}
+                            <a href="/logout" class="btn btn-outline-dark btn-login">logout</a>
+                        {% else %}
+                            <a href="/login" class="btn btn-outline-dark btn-login">Login</a>
+                            <a href="/register" class=" btn btn-outline-dark btn-register">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <span class="hero-label">New Collection 2025</span>
+                        <h1 class="hero-title">Innovation meets elegance</h1>
+                        <p class="hero-description">Experience the future of technology with our curated selection of premium electronics. Designed for those who demand excellence.</p>
+                        <div class="hero-actions">
+                            <a href="#products" class="btn-primary-custom">Explore Collection</a>
+                            <a href="#about" class="btn-secondary-custom">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-visual">
+                        <div class="floating-card">
+                            <div class="product-preview">
+                                <div class="preview-image">
+                                    <img src="/static/image/pc.png" width="100%" height="100%" alt="">
+                                </div>
+                                <div class="preview-info">
+                                    <h6>ProMax Ultra</h6>
+                                    <p>$999</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-6">
+                    <div class="stat-item">
+                        <h3>50K+</h3>
+                        <p>Happy customers worldwide</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="stat-item">
+                        <h3>98%</h3>
+                        <p>Customer satisfaction rate</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="stat-item">
+                        <h3>1000+</h3>
+                        <p>Premium products</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="stat-item">
+                        <h3>24/7</h3>
+                        <p>Expert support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="categories" class="categories-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Shop by category</h2>
+                <p class="section-subtitle">Discover our carefully curated collections</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="category-card-large">
+                        <div class="category-content">
+                            <span class="category-number">01</span>
+                            <h3>Smartphones</h3>
+                            <p>The latest flagship devices with cutting-edge technology</p>
+                            <a href="#" class="category-link">
+                                Explore <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="category-visual">
+                            <div class="visual-element"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="category-card-large">
+                        <div class="category-content">
+                            <span class="category-number">02</span>
+                            <h3>Laptops</h3>
+                            <p>Power and performance for professionals and creators</p>
+                            <a href="#" class="category-link">
+                                Explore <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="category-visual">
+                            <div class="visual-element"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="category-card-small">
+                        <i class="bi bi-headphones"></i>
+                        <h5>Audio</h5>
+                        <p>Premium sound</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="category-card-small">
+                        <i class="bi bi-smartwatch"></i>
+                        <h5>Wearables</h5>
+                        <p>Stay connected</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="category-card-small">
+                        <i class="bi bi-camera"></i>
+                        <h5>Cameras</h5>
+                        <p>Capture moments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section id="products" class="products-section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Featured products</h2>
+                    <p class="section-subtitle">Handpicked excellence</p>
+                </div>
+                <a href="#" class="view-all-link">View all products <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="row g-4">
+                {% for product in products %}
+                <div class="col-lg-3 col-md-6">
+                    <div class="product-card-premium">
+                        <div class="product-image-wrapper">
+                            {% if product.badge %}
+                            <span class="product-badge{% if product.badge_type %} {{ product.badge_type }}{% endif %}">{{ product.badge }}</span>
+                            {% endif %}
+                            <button class="wishlist-btn-premium">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                            <div class="product-image-premium">
+                                {% if product.image_url %}
+                                <img src="{{ product.image_url }}" class="object-fit-contain" width="100%" height="100%" alt="{{ product.name }}">
+                                {% else %}
+                                <div class="placeholder-product{% if product.placeholder_class %} {{ product.placeholder_class }}{% endif %}"></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="product-details">
+                            <span class="product-category">{{ product.category }}</span>
+                            <h6 class="product-name">{{ product.name }}</h6>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    {% for star in product.stars %}
+                                    <i class="bi bi-star{{ '-fill' if star == 'fill' else '-half' if star == 'half' else '' }}"></i>
+                                    {% endfor %}
+                                </div>
+                                <span class="rating-count">({{ product.rating_count }})</span>
+                            </div>
+                            <div class="product-footer">
+                                <div class="product-price">
+                                    {% if product.price_old %}
+                                    <span class="price-old">{{ product.price_old }}</span>
+                                    {% endif %}
+                                    <span class="price-current">{{ product.price_current }}</span>
+                                </div>
+                                <button class="add-to-cart-btn">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Banner -->
+    <section class="feature-banner">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="banner-visual">
+                        <div class="banner-shape">
+                            <img src="https://i.pinimg.com/736x/a2/9a/eb/a29aebe058da56d7c3ab5e4e6cc7d430.jpg" width="100%" height="100%" class="rounded-circle object-fit-cover" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="banner-content">
+                        <h2>Experience unparalleled quality</h2>
+                        <p>Every product in our collection is carefully selected to meet the highest standards of design, performance, and reliability. We partner with leading brands to bring you the best technology has to offer.</p>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Premium build quality</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Latest technology</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Extended warranty</li>
+                        </ul>
+                        <a href="#" class="btn-primary-custom">Learn more</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h6>Free Shipping</h6>
+                        <p>On all orders over $100</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h6>Secure Payment</h6>
+                        <p>100% protected transactions</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <h6>Easy Returns</h6>
+                        <p>30-day money-back guarantee</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <h6>24/7 Support</h6>
+                        <p>Expert assistance anytime</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section id="contact" class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-wrapper">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h2 class="newsletter-title">Stay in the loop</h2>
+                        <p class="newsletter-description">Subscribe to receive exclusive offers, product launches, and tech insights delivered to your inbox.</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <form class="newsletter-form">
+                            <div class="input-wrapper">
+                                <input type="email" placeholder="Enter your email" required>
+                                <button type="submit" class="btn-subscribe">Subscribe</button>
+                            </div>
+                            <p class="newsletter-note">We respect your privacy. Unsubscribe anytime.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="footer-brand">
+                            <h5><span class="brand-icon">◆</span> NEXUS</h5>
+                            <p>Premium electronics for those who demand excellence. Experience the future of technology today.</p>
+                            <div class="social-links">
+                                <a href="#"><i class="bi bi-instagram"></i></a>
+                                <a href="#"><i class="bi bi-twitter-x"></i></a>
+                                <a href="#"><i class="bi bi-facebook"></i></a>
+                                <a href="#"><i class="bi bi-youtube"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Shop</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Smartphones</a></li>
+                            <li><a href="#">Laptops</a></li>
+                            <li><a href="#">Audio</a></li>
+                            <li><a href="#">Wearables</a></li>
+                            <li><a href="#">Accessories</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Support</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Shipping</a></li>
+                            <li><a href="#">Returns</a></li>
+                            <li><a href="#">Warranty</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Company</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Press</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Partners</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Legal</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                            <li><a href="#">Licenses</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 NEXUS. All rights reserved.</p>
+                <div class="payment-methods">
+                    <i class="bi bi-credit-card"></i>
+                    <i class="bi bi-paypal"></i>
+                    <i class="bi bi-apple"></i>
+                    <i class="bi bi-google"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>
