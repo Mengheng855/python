@@ -132,58 +132,11 @@
                 <h2 class="section-title">Shop by category</h2>
                 <p class="section-subtitle">Discover our carefully curated collections</p>
             </div>
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="category-card-large">
-                        <div class="category-content">
-                            <span class="category-number">01</span>
-                            <h3>Smartphones</h3>
-                            <p>The latest flagship devices with cutting-edge technology</p>
-                            <a href="#" class="category-link">
-                                Explore <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                        <div class="category-visual">
-                            <div class="visual-element"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="category-card-large">
-                        <div class="category-content">
-                            <span class="category-number">02</span>
-                            <h3>Laptops</h3>
-                            <p>Power and performance for professionals and creators</p>
-                            <a href="#" class="category-link">
-                                Explore <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                        <div class="category-visual">
-                            <div class="visual-element"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="category-card-small">
-                        <i class="bi bi-headphones"></i>
-                        <h5>Audio</h5>
-                        <p>Premium sound</p>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="category-card-small">
-                        <i class="bi bi-smartwatch"></i>
-                        <h5>Wearables</h5>
-                        <p>Stay connected</p>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="category-card-small">
-                        <i class="bi bi-camera"></i>
-                        <h5>Cameras</h5>
-                        <p>Capture moments</p>
-                    </div>
-                </div>
+            <div class="category-filters">
+                <button class="category-filter-btn active" data-category="all">All</button>
+                {% for cate in category %}
+                <button class="category-filter-btn" data-category="{{ cate[0] }}">{{ cate[1] }}</button>
+                {% endfor %}
             </div>
         </div>
     </section>
@@ -203,37 +156,29 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="product-card-premium">
                         <div class="product-image-wrapper">
-                            {% if product.badge %}
-                            <span class="product-badge{% if product.badge_type %} {{ product.badge_type }}{% endif %}">{{ product.badge }}</span>
+                            {% if product[7] %}
+                            <span class="product-badge{% if product.badge_type %} {{ product.badge_type }}{% endif %}">{{ product[7] }}</span>
                             {% endif %}
                             <button class="wishlist-btn-premium">
                                 <i class="bi bi-heart"></i>
                             </button>
                             <div class="product-image-premium">
-                                {% if product.image_url %}
-                                <img src="{{ product.image_url }}" class="object-fit-contain" width="100%" height="100%" alt="{{ product.name }}">
+                                {% if product[6] %}
+                                <img src="{{ product[6] }}" class="object-fit-contain" width="100%" height="100%" alt="{{ product.name }}">
                                 {% else %}
                                 <div class="placeholder-product{% if product.placeholder_class %} {{ product.placeholder_class }}{% endif %}"></div>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="product-details">
-                            <span class="product-category">{{ product.category }}</span>
-                            <h6 class="product-name">{{ product.name }}</h6>
-                            <div class="product-rating">
-                                <div class="stars">
-                                    {% for star in product.stars %}
-                                    <i class="bi bi-star{{ '-fill' if star == 'fill' else '-half' if star == 'half' else '' }}"></i>
-                                    {% endfor %}
-                                </div>
-                                <span class="rating-count">({{ product.rating_count }})</span>
-                            </div>
+                            <span class="product-category">{{ product[7] }}</span>
+                            <h6 class="product-name">{{ product[1] }}</h6>
                             <div class="product-footer">
                                 <div class="product-price">
-                                    {% if product.price_old %}
-                                    <span class="price-old">{{ product.price_old }}</span>
+                                    {% if product[2] %}
+                                    <span class="price-old">${{ product[2] }}</span> <br>
                                     {% endif %}
-                                    <span class="price-current">{{ product.price_current }}</span>
+                                    <span class="price-current">${{ product[4] }}</span>
                                 </div>
                                 <button class="add-to-cart-btn">
                                     <i class="bi bi-plus"></i>
@@ -320,26 +265,34 @@
 
     <!-- Newsletter Section -->
     <section id="contact" class="newsletter-section">
-        <div class="container">
-            <div class="newsletter-wrapper">
-                <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <h2 class="newsletter-title">Stay in the loop</h2>
-                        <p class="newsletter-description">Subscribe to receive exclusive offers, product launches, and tech insights delivered to your inbox.</p>
-                    </div>
-                    <div class="col-lg-6">
-                        <form class="newsletter-form">
-                            <div class="input-wrapper">
-                                <input type="email" placeholder="Enter your email" required>
-                                <button type="submit" class="btn-subscribe">Subscribe</button>
-                            </div>
-                            <p class="newsletter-note">We respect your privacy. Unsubscribe anytime.</p>
-                        </form>
-                    </div>
+    <div class="container">
+        <div class="newsletter-wrapper">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="newsletter-title">Stay in the loop</h2>
+                    <p class="newsletter-description">Subscribe to receive exclusive offers, product launches, and tech insights delivered to your inbox.</p>
+                </div>
+                <div class="col-lg-6">
+                    <form class="newsletter-form" action="/subscribe" method="POST">
+                        <div class="input-wrapper">
+                            <input type="email" name="email" placeholder="Enter your email" required>
+                            <button type="submit" class="btn-subscribe">Subscribe</button>
+                        </div>
+                        {% if request.args.get('success') == 'subscribed' %}
+                        <p class="newsletter-success">Thank you for subscribing! Check your email for confirmation.</p>
+                        {% elif request.args.get('error') == 'already_subscribed' %}
+                        <p class="newsletter-error">This email is already subscribed to our newsletter.</p>
+                        {% elif request.args.get('error') == 'subscription_failed' %}
+                        <p class="newsletter-error">Subscription failed. Please try again later.</p>
+                        {% else %}
+                        <p class="newsletter-note">We respect your privacy. Unsubscribe anytime.</p>
+                        {% endif %}
+                    </form>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Footer -->
     <footer class="footer">

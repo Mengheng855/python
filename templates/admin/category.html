@@ -727,11 +727,10 @@
 <div class="page-header">
     <div>
         <h2 class="page-title">Manage Categories</h2>
-        <p class="text-muted mb-0">Add, edit, and manage your product categories</p>
     </div>
     <div class="page-actions">
         <button class="btn-secondary-custom"><i class="bi bi-funnel me-2"></i>Filter</button>
-        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#categoryModal">
+        <button class="btn-primary-custom" id="add" data-bs-toggle="modal" data-bs-target="#categoryModal">
             <i class="bi bi-plus-circle me-2"></i>Add Category
         </button>
     </div>
@@ -739,33 +738,12 @@
 
 <!-- Stats Cards -->
 <div class="stats-grid">
-    <div class="stat-card">
+    <div class="stat-card col-3">
         <div class="stat-header">
             <div class="stat-icon primary"><i class="bi bi-grid"></i></div>
         </div>
-        <div class="stat-value">{{ total_categories|default('12') }}</div>
+        <div class="stat-value">{{ total_cate|default('0') }}</div>
         <div class="stat-label">Total Categories</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
-        </div>
-        <div class="stat-value">{{ active_categories|default('10') }}</div>
-        <div class="stat-label">Active Categories</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon warning"><i class="bi bi-exclamation-triangle"></i></div>
-        </div>
-        <div class="stat-value">{{ empty_categories|default('2') }}</div>
-        <div class="stat-label">Empty Categories</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon danger"><i class="bi bi-x-circle"></i></div>
-        </div>
-        <div class="stat-value">{{ inactive_categories|default('1') }}</div>
-        <div class="stat-label">Inactive Categories</div>
     </div>
 </div>
 
@@ -776,16 +754,8 @@
             <label class="filter-label">Search Categories</label>
             <input type="text" class="filter-input" placeholder="Search by name...">
         </div>
-        <div class="filter-group">
-            <label class="filter-label">Status</label>
-            <select class="filter-select">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-        </div>
         <div class="filter-actions">
-            <button class="btn-secondary-custom"><i class="bi bi-x-circle me-2"></i>Clear</button>
+            <button id="clearBtn" class="btn-secondary-custom"><i class="bi bi-x-circle me-2"></i>Clear</button>
             <button class="btn-primary-custom"><i class="bi bi-search me-2"></i>Search</button>
         </div>
     </div>
@@ -817,15 +787,15 @@
         <tbody>
             {% for category in cate %}
             <tr>
-                <td class="category-id">#{{ category[0] }}</td>
+                <td class="category-id">{{ category[0] }}</td>
                 <td class="category-name">{{ category[1] }}</td>
                 <td class="category-created">{{ category[2] }}</td>
                 <td class="category-updated">{{ category[3] }}</td>
                 <td class="category-username">{{ category[4] }}</td>
             
                 <td class="category-actions">
-                    <button class="action-btn-admin edit"><i class="bi bi-pencil"></i>Edit</button>
-                    <button class="action-btn-admin delete"><i class="bi bi-trash"></i>Delete</button>
+                    <button class="action-btn-admin edit" id="edit" data-bs-toggle="modal" data-bs-target="#categoryModal"><i class="bi bi-pencil"></i>Edit</button>
+                    <a href="/admin/deleteCategory/{{category[0]}}" onclick="return confirm('Are you sure?')" class="action-btn-admin delete"><i class="bi bi-trash"></i>Delete</a>
                 </td>
             </tr>
             {% endfor %}
@@ -872,21 +842,56 @@
                             </div>
                         </div>
                     </div>
-
-                   
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="bi bi-x-circle me-2"></i>Cancel
                     </button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" id="btnAdd" class="btn btn-primary">
                         <i class="bi bi-check-circle me-2"></i>Add Category
+                    </button>
+                    <button type="submit" id="update" class="btn btn-primary">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Category
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
+<script>
+    $(document).ready(function(){
+         $('#add').click(function () {
+            $('#update').hide()
+            $('#btnAdd').show()
+            $('#exampleModalLabel').html('<i class="bi bi-plus-circle me-2"></i>Add New Category')
+            $('#categoryForm')[0].reset()
+            $('#categoryForm').attr('action', '/admin/category')
+        })
+        $(document).on('click', '#edit', function () {
+            $('#update').show()
+            $('#btnAdd').hide()
+            $('#exampleModalLabel').html('<i class="bi bi-pencil-square me-2"></i>Edit Category')
+            const row = $(this).closest('tr')
+            const id = row.find('td:eq(0)').text().trim()
+            const name = row.find('td:eq(1)').text().trim()
+            $('#categoryName').val(name)
+            $('#categoryForm').attr('action', `/admin/editCategory/${id}`)
+        })
+        $('.filter-input').on('keyup', function () {
+            let searchValue = $(this).val().toLowerCase().trim()
+            $('.categories-table tbody tr').each(function () {
+                let productName = $(this).find('td:eq(1)').text().toLowerCase()
+                if (productName.includes(searchValue) || searchValue === '') {
+                    $(this).show()
+                } else {
+                    $(this).hide()
+                }
+            })
+        })
+         $('#clearBtn').on('click', function () {
+            $('.filter-input').val('')
+            $('.categories-table tbody tr').show()
+        })
+    })
+</script>
 {% endblock %}

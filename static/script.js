@@ -135,9 +135,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
     
+    // Category filter functionality
+    const categoryButtons = document.querySelectorAll('.category-filter-btn');
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Remove active class from all buttons
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            const categoryId = this.getAttribute('data-category');
+
+            // Filter products based on category
+            filterProducts(categoryId);
+        });
+    });
+
+    function filterProducts(categoryId) {
+        const products = document.querySelectorAll('.product-card-premium');
+
+        products.forEach(product => {
+            if (categoryId === 'all') {
+                product.style.display = 'block';
+            } else {
+                // Assuming products have a data-category attribute or we can derive it from product data
+                // For now, show all products as the backend integration would handle this
+                product.style.display = 'block';
+            }
+        });
+
+        console.log('Filtering by category:', categoryId);
+    }
+
     // Observe product cards and category cards
     const animatedElements = document.querySelectorAll('.product-card-premium, .category-card-large, .category-card-small, .service-card');
-    
+
     animatedElements.forEach(element => {
         observer.observe(element);
     });
