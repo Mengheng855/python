@@ -787,7 +787,7 @@
         <tbody>
             {% for category in cate %}
             <tr>
-                <td class="category-id">{{ category[0] }}</td>
+                <td class="category-id">{{ loop.index }}</td>
                 <td class="category-name">{{ category[1] }}</td>
                 <td class="category-created">{{ category[2] }}</td>
                 <td class="category-updated">{{ category[3] }}</td>

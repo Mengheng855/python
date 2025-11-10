@@ -38,24 +38,127 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Wishlist functionality
-    const wishlistButtons = document.querySelectorAll('.wishlist-btn-premium');
-    
-    wishlistButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const icon = this.querySelector('i');
-            
-            if (this.classList.contains('active')) {
-                this.classList.remove('active');
-                icon.className = 'bi bi-heart';
-            } else {
-                this.classList.add('active');
-                icon.className = 'bi bi-heart-fill';
+    // Favorites functionality using localStorage
+    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+    function updateFavoritesCount() {
+        const countElement = document.getElementById('favorites-count');
+        if (countElement) {
+            countElement.textContent = favorites.length;
+        }
+    }
+
+    function updateFavoriteButtons() {
+        const wishlistButtons = document.querySelectorAll('.wishlist-btn-premium');
+
+        wishlistButtons.forEach(button => {
+            const productCard = button.closest('.product-card-premium');
+            if (productCard) {
+                const productId = productCard.querySelector('.product-category-hidden').value;
+                const icon = button.querySelector('i');
+
+                if (favorites.includes(productId)) {
+                    button.classList.add('active');
+                    icon.className = 'bi bi-heart-fill';
+                } else {
+                    button.classList.remove('active');
+                    icon.className = 'bi bi-heart';
+                }
             }
         });
+    }
+
+    // Initialize favorite buttons and count on page load
+    updateFavoriteButtons();
+    updateFavoritesCount();
+
+    // Favorites button click handler - now it's a link, so no modal needed
+    // The link will navigate to /favorites page
+
+    function showFavoritesModal() {
+        // Remove existing modal if any
+        const existingModal = document.getElementById('favorites-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Create modal
+        const modal = document.createElement('div');
+        modal.id = 'favorites-modal';
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">My Favorites (${favorites.length})</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${favorites.length === 0 ?
+                            '<p class="text-center text-muted">No favorites yet. Click the heart icon on products to add them here!</p>' :
+                            '<div class="row g-3" id="favorites-list"></div>'
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Populate favorites if any
+        if (favorites.length > 0) {
+            const favoritesList = modal.querySelector('#favorites-list');
+            favorites.forEach(favId => {
+                // Find the product card with this category
+                const productCard = Array.from(document.querySelectorAll('.product-card-premium')).find(card => {
+                    return card.querySelector('.product-category-hidden').value === favId;
+                });
+
+                if (productCard) {
+                    const clone = productCard.cloneNode(true);
+                    const col = document.createElement('div');
+                    col.className = 'col-lg-3 col-md-6';
+                    col.appendChild(clone);
+                    favoritesList.appendChild(col);
+                }
+            });
+        }
+
+        // Show modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
+    // Wishlist functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.wishlist-btn-premium')) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const button = e.target.closest('.wishlist-btn-premium');
+            const productCard = button.closest('.product-card-premium');
+            const productId = productCard.querySelector('.product-category-hidden').value;
+            const icon = button.querySelector('i');
+
+            if (favorites.includes(productId)) {
+                // Remove from favorites
+                const index = favorites.indexOf(productId);
+                favorites.splice(index, 1);
+                button.classList.remove('active');
+                icon.className = 'bi bi-heart';
+            } else {
+                // Add to favorites
+                favorites.push(productId);
+                button.classList.add('active');
+                icon.className = 'bi bi-heart-fill';
+            }
+
+            // Save to localStorage
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+
+            // Update favorites count
+            updateFavoritesCount();
+        }
     });
     
     // Newsletter form
@@ -156,15 +259,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function filterProducts(categoryId) {
-        const products = document.querySelectorAll('.product-card-premium');
+        const productColumns = document.querySelectorAll('.col-lg-3.col-md-6');
 
-        products.forEach(product => {
-            if (categoryId === 'all') {
-                product.style.display = 'block';
-            } else {
-                // Assuming products have a data-category attribute or we can derive it from product data
-                // For now, show all products as the backend integration would handle this
-                product.style.display = 'block';
+        productColumns.forEach(column => {
+            const product = column.querySelector('.product-card-premium');
+            if (product) {
+                const productCategory = product.querySelector('.product-category-hidden').value;
+                if (categoryId === 'all' || productCategory.toLowerCase() === categoryId.toLowerCase()) {
+                    column.style.display = 'block';
+                } else {
+                    column.style.display = 'none';
+                }
             }
         });
 

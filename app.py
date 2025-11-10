@@ -282,6 +282,7 @@ def category():
         SELECT c.cate_id, c.name, c.created_at, c.updated_at, a.username
         FROM category c
         INNER JOIN user a ON c.user_id = a.user_id
+        ORDER BY c.cate_id DESC
     """)
     cate=cursor.fetchall()
     return render_template('admin/category.html',cate=cate,total_cate=total_cate)
@@ -302,5 +303,8 @@ def editCategory(id):
         cursor.execute('UPDATE category SET name=%s, user_id=%s WHERE cate_id=%s',(cate_name,user_id,id))
         conn.commit()
         return redirect('/admin/category')
+@app.route('/favorites')
+def favorites():
+    return render_template('user/favorites.html')
 if __name__=='__main__':
     app.run(debug=True)

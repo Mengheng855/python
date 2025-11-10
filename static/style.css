@@ -570,6 +570,23 @@ body {
     background-color: var(--color-success);
 }
 
+/* Favorites badge */
+.favorites-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--color-danger);
+    color: var(--color-white);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+}
+
 /* Feature Banner */
 .feature-banner {
     padding: 6rem 0;
