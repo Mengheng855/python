@@ -69,13 +69,24 @@ def subscribe():
 def index():
     conn=get_db()
     cursor=conn.cursor()
-    cursor.execute("""
-        SELECT p.pro_id, p.pro_name, p.price, p.discount, p.total, p.stock,  p.image,
-                c.name as category_name
-        FROM product p
-        INNER JOIN user u ON p.user_id = u.user_id
-        INNER JOIN category c ON p.cate_id = c.cate_id
-    """)
+    view_all = request.args.get('view') == 'all'
+    if view_all:
+        cursor.execute("""
+            SELECT p.pro_id, p.pro_name, p.price, p.discount, p.total, p.stock,  p.image,
+                    c.name as category_name
+            FROM product p
+            INNER JOIN user u ON p.user_id = u.user_id
+            INNER JOIN category c ON p.cate_id = c.cate_id
+        """)
+    else:
+        cursor.execute("""
+            SELECT p.pro_id, p.pro_name, p.price, p.discount, p.total, p.stock,  p.image,
+                    c.name as category_name
+            FROM product p
+            INNER JOIN user u ON p.user_id = u.user_id
+            INNER JOIN category c ON p.cate_id = c.cate_id
+            LIMIT 4
+        """)
     products=cursor.fetchall()
     cursor.execute('SELECT * FROM category')
     category=cursor.fetchall()
@@ -127,6 +138,22 @@ def register():
 def logout():
     session.clear()
     return redirect('/')
+@app.route('/product/<int:id>')
+def product_detail(id):
+    conn=get_db()
+    cursor=conn.cursor()
+    cursor.execute("""
+        SELECT p.pro_id, p.pro_name, p.price, p.discount, p.total, p.stock, p.status, p.image,
+               p.created_at, p.updated_at, u.username, c.name as category_name
+        FROM product p
+        INNER JOIN user u ON p.user_id = u.user_id
+        INNER JOIN category c ON p.cate_id = c.cate_id
+        WHERE p.pro_id = %s
+    """, (id,))
+    product=cursor.fetchone()
+    if not product:
+        return redirect('/')
+    return render_template('user/product_detail.html', product=product)
 @app.route('/admin')
 def admin():
     if session.get('is_admin')!=1:
@@ -197,6 +224,7 @@ def product():
         FROM product p
         INNER JOIN user u ON p.user_id = u.user_id
         INNER JOIN category c ON p.cate_id = c.cate_id
+        ORDER BY p.pro_id DESC
     """)
     product=cursor.fetchall()
     return render_template('admin/product.html',cate=cate,product=product,total_product=total_product,active_product=active_product,low_product=low_product,out_product=out_product,status=status)
@@ -276,6 +304,3 @@ def editCategory(id):
         return redirect('/admin/category')
 if __name__=='__main__':
     app.run(debug=True)
-
-
-

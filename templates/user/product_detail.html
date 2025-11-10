@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product[1] }} - NEXUS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="brand-icon">◆</span> NEXUS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#categories">Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-4">
+                    <button class="icon-btn" aria-label="Search">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <button class="icon-btn position-relative" aria-label="Cart">
+                        <i class="bi bi-bag"></i>
+                        <span class="cart-badge">0</span>
+                    </button>
+                    <div class="auth-buttons d-flex gap-2">
+                        {% if session.get('user_id') %}
+                            <a href="/logout" class="btn btn-outline-dark btn-login">logout</a>
+                        {% else %}
+                            <a href="/login" class="btn btn-outline-dark btn-login">Login</a>
+                            <a href="/register" class=" btn btn-outline-dark btn-register">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail-section py-5">
+        <div class="container">
+            <div class="row g-5">
+                <!-- Product Image -->
+                <div class="col-lg-6">
+                    <div class="product-image-container">
+                        {% if product[7] %}
+                        <img src="{{ product[7] }}" class="img-fluid rounded shadow" alt="{{ product[1] }}">
+                        {% else %}
+                        <div class="placeholder-product-detail"></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/#products">Products</a></li>
+                                <li class="breadcrumb-item active">{{ product[11] }}</li>
+                            </ol>
+                        </nav>
+
+                        <h1 class="product-title mb-3">{{ product[1] }}</h1>
+
+                        <div class="product-price mb-4">
+                            {% if product[3] %}
+                            <span class="price-old">${{ product[2] }}</span>
+                            <span class="price-current ms-2">${{ product[4] }}</span>
+                            <span class="discount-badge ms-2">{{ product[3] }}% OFF</span>
+                            {% else %}
+                            <span class="price-current">${{ product[4] }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-meta mb-4">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="meta-item">
+                                        <i class="bi bi-box-seam"></i>
+                                        <span>Stock: {{ product[5] }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="meta-item">
+                                        <i class="bi bi-tag"></i>
+                                        <span>Category: {{ product[11] }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="meta-item">
+                                        <i class="bi bi-person"></i>
+                                        <span>Added by: {{ product[10] }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="meta-item">
+                                        <i class="bi bi-calendar"></i>
+                                        <span>Updated: {{ product[9].strftime('%Y-%m-%d') if product[9] else 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <div class="quantity-selector mb-3">
+                                <label class="form-label">Quantity:</label>
+                                <div class="input-group" style="width: 150px;">
+                                    <button class="btn btn-outline-secondary" type="button" id="decreaseQty">-</button>
+                                    <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="{{ product[5] }}">
+                                    <button class="btn btn-outline-secondary" type="button" id="increaseQty">+</button>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-lg me-3" id="addToCart">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline-secondary btn-lg" id="addToWishlist">
+                                    <i class="bi bi-heart"></i> Add to Wishlist
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="product-status mt-4">
+                            {% if product[6] == 1 %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="footer-brand">
+                            <h5><span class="brand-icon">◆</span> NEXUS</h5>
+                            <p>Premium electronics for those who demand excellence. Experience the future of technology today.</p>
+                            <div class="social-links">
+                                <a href="#"><i class="bi bi-instagram"></i></a>
+                                <a href="#"><i class="bi bi-twitter-x"></i></a>
+                                <a href="#"><i class="bi bi-facebook"></i></a>
+                                <a href="#"><i class="bi bi-youtube"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Shop</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Smartphones</a></li>
+                            <li><a href="#">Laptops</a></li>
+                            <li><a href="#">Audio</a></li>
+                            <li><a href="#">Wearables</a></li>
+                            <li><a href="#">Accessories</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Support</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Shipping</a></li>
+                            <li><a href="#">Returns</a></li>
+                            <li><a href="#">Warranty</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Company</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Press</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Partners</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-6">
+                        <h6 class="footer-heading">Legal</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                            <li><a href="#">Licenses</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 NEXUS. All rights reserved.</p>
+                <div class="payment-methods">
+                    <i class="bi bi-credit-card"></i>
+                    <i class="bi bi-paypal"></i>
+                    <i class="bi bi-apple"></i>
+                    <i class="bi bi-google"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/script.js"></script>
+    <script>
+        // Quantity selector functionality
+        document.getElementById('decreaseQty').addEventListener('click', function() {
+            const qtyInput = document.getElementById('quantity');
+            const currentValue = parseInt(qtyInput.value);
+            if (currentValue > 1) {
+                qtyInput.value = currentValue - 1;
+            }
+        });
+
+        document.getElementById('increaseQty').addEventListener('click', function() {
+            const qtyInput = document.getElementById('quantity');
+            const currentValue = parseInt(qtyInput.value);
+            const maxStock = parseInt(qtyInput.max);
+            if (currentValue < maxStock) {
+                qtyInput.value = currentValue + 1;
+            }
+        });
+
+        // Add to cart functionality (placeholder)
+        document.getElementById('addToCart').addEventListener('click', function() {
+            const quantity = document.getElementById('quantity').value;
+            alert(`Added ${quantity} item(s) to cart!`);
+        });
+
+        // Add to wishlist functionality (placeholder)
+        document.getElementById('addToWishlist').addEventListener('click', function() {
+            alert('Added to wishlist!');
+        });
+    </script>
+</body>
+</html>

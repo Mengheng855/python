@@ -853,7 +853,7 @@
         <tbody>
             {% for pro in product|default([]) %}
             <tr>
-                <td class="product-id">{{ pro[0] }}</td>
+                <td class="product-id">{{ loop.index }}</td>
                 <td class="product-name">{{ pro[1] }}</td>
                 <td class="product-category" data-category-id="{{ pro[0] }}">{{ pro[11] }}</td>
                 <td class="product-price">${{ pro[2] }}</td>
