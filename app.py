@@ -189,7 +189,7 @@ class AutoRegisterTester:
 
 if __name__ == "__main__":
     
-    BASE_URL = "https://hmslawfirms.com"  
+    BASE_URL = "url"  
     NUM_ITERATIONS = 10000000000  
     
    
