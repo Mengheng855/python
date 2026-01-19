@@ -282,7 +282,7 @@ def category():
         SELECT c.cate_id, c.name, c.created_at, c.updated_at, a.username
         FROM category c
         INNER JOIN user a ON c.user_id = a.user_id
-        ORDER BY c.cate_id DESC
+        ORDER BY c.cate_id DESC 
     """)
     cate=cursor.fetchall()
     return render_template('admin/category.html',cate=cate,total_cate=total_cate)
