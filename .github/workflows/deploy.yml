@@ -1,0 +1,25 @@
+name: Deploy Flask to VPS
+
+on:
+  push:
+    branches: [project]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to AWS VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: 13.55.134.169
+          username: ubuntu
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/backend/python
+            git pull origin project
+            source ../venv/bin/activate
+            pip install -r requirements.txt
+            sudo chown -R ubuntu:www-data static/
+            sudo systemctl restart flask-app
+            echo "✅ Deployment successful!"
