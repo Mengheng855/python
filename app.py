@@ -19,7 +19,8 @@ def get_db():
         user='root',
         passwd='',
         database='db_flask_project'
-    )
+    ) 
+ 
 app.config['UPLOADE_FOLDER']='static/productImage'
 @app.route('/subscribe',methods=['POST'])
 def subscribe():
