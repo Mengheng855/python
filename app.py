@@ -308,4 +308,4 @@ def editCategory(id):
 def favorites():
     return render_template('user/favorites.html')
 if __name__=='__main__':
-    app.run(debug=True)
+    app.run(debug=True)# CI/CD test
