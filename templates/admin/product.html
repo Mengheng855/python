@@ -367,61 +367,67 @@
     }
 
     .action-btn-admin {
-        padding: 8px 10px;
-        border: none;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 5px 10px !important;
+        border: 1px solid !important;
+        border-radius: 5px !important;
+        font-size: 0.7rem !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.35rem !important;
         position: relative;
         overflow: hidden;
+        white-space: nowrap !important;
+        min-width: fit-content;
     }
 
-    .action-btn-admin::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
+    .action-btn-admin i {
+        font-size: 0.85rem !important;
     }
 
-
-
-    .action-btn-admin.edit {
-        background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(66, 153, 225, 0.05));
-        color: var(--admin-accent);
-        border: none;
+    /* Actions Cell */
+    .actions-cell {
+        flex-wrap: wrap;
+        min-width: 130px;
     }
 
-    .action-btn-admin.edit:hover {
-        background: linear-gradient(135deg, var(--admin-accent), #3182ce);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
-        border: none;
+    /* Edit Button Styles */
+    td .action-btn-admin.edit {
+        background: #e0f2fe !important;
+        color: #0ea5e9 !important;
+        border-color: #bae6fd !important;
     }
 
-    .action-btn-admin.delete {
-        background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.05));
-        color: var(--admin-danger);
-        border: none;
+    td .action-btn-admin.edit:hover {
+        background: #0ea5e9 !important;
+        color: white !important;
+        border-color: #0ea5e9 !important;
+        box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3) !important;
+        transform: translateY(-1px) !important;
     }
 
-    .action-btn-admin.delete:hover {
-        background: linear-gradient(135deg, var(--admin-danger), #e53e3e);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
-        border: none;
+    /* Delete Button Styles */
+    td .action-btn-admin.delete {
+        background: #fee2e2 !important;
+        color: #ef4444 !important;
+        border-color: #fecaca !important;
+        text-decoration: none !important;
+    }
+
+    td .action-btn-admin.delete:hover {
+        background: #ef4444 !important;
+        color: white !important;
+        border-color: #ef4444 !important;
+        box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3) !important;
+        transform: translateY(-1px) !important;
+        text-decoration: none !important;
+    }
+
+    td .action-btn-admin.delete:hover i {
+        color: white !important;
     }
 
     /* Filters and Search */
@@ -825,16 +831,10 @@
         </div>
     </div>
 </div>
-<!-- Bulk Actions -->
-<div class="bulk-actions"><input type="checkbox" class="bulk-checkbox" id="selectAll"><label for="selectAll"
-        class="bulk-text">Select All</label>
-    <div class="bulk-buttons"><button class="btn-secondary-custom"><i class="bi bi-tag me-2"></i>Bulk
-            Edit </button><button class="btn-secondary-custom"><i class="bi bi-trash me-2"></i>Delete
-            Selected </button></div>
-</div>
+
 <!-- Products Table -->
 <div class="products-table-container">
-    <table class="products-table">
+    <table class="products-table text-center align-items-center">
         <thead>
             <tr>
                 <th>Product ID</th>
@@ -855,7 +855,7 @@
             <tr>
                 <td class="product-id">{{ loop.index }}</td>
                 <td class="product-name">{{ pro[1] }}</td>
-                <td class="product-category" data-category-id="{{ pro[0] }}">{{ pro[11] }}</td>
+                <td class="product-category" data-category-id="{{ pro[11] }}">{{ pro[12] }}</td>
                 <td class="product-price">${{ pro[2] }}</td>
                 <td class="product-price">{{ pro[3] }}%</td>
                 <td>${{pro[4]}}</td>
@@ -867,7 +867,7 @@
                     </span>
                 </td>
                 <td><img src="{{pro[7]}}" width="60px" height="60px" alt=""></td>
-                <td class="d-flex p-4 gap-2">
+                <td class="d-flex p-2 gap-2 mt-3">
                     <button class="action-btn-admin edit" data-bs-toggle="modal" data-bs-target="#exampleModal"><i
                             class="bi bi-pencil"></i>Edit</button>
                     <a href="/admin/deleteProduct/{{pro[0]}}" class="action-btn-admin delete"
@@ -1229,26 +1229,35 @@
             $('#image').val(image)
             $('#productForm').attr('action', `/admin/editProduct/${pro_id}`)
         })
-        $('.filter-input').on('keyup', function () {
-            let searchValue = $(this).val().toLowerCase().trim()
-
+        // Function to filter by search
+        function filterBySearch(searchValue) {
             $('.products-table tbody tr').each(function () {
                 let productName = $(this).find('td:eq(1)').text().toLowerCase()
-
                 if (productName.includes(searchValue) || searchValue === '') {
                     $(this).show()
                 } else {
                     $(this).hide()
                 }
             })
+        }
+
+        $('.filter-input').on('keyup', function () {
+            let searchValue = $(this).val().toLowerCase().trim()
+            filterBySearch(searchValue)
+        })
+
+        // Search button
+        $('#searchBtn').on('click', function () {
+            let searchValue = $('.filter-input').val().toLowerCase().trim()
+            filterBySearch(searchValue)
         })
 
         // Search by category
         $('.filter-select').eq(0).on('change', function () {
-            let categoryValue = $(this).val().toLowerCase().trim()
+            let categoryValue = $(this).val().trim() // Keep as string for ID comparison
             $('.products-table tbody tr').each(function () {
-                let productCategory = $(this).find('td:eq(2)').text().toLowerCase()
-                if (productCategory === categoryValue || categoryValue === '') {
+                let productCategoryId = $(this).find('td:eq(2)').data('category-id')
+                if (productCategoryId == categoryValue || categoryValue === '') {
                     $(this).show()
                 } else {
                     $(this).hide()

@@ -202,7 +202,7 @@ def product():
         name=request.form['productName']
         price=float(request.form['price'])
         status=request.form['status']
-        discount=float(request.form['discount']) if request.form['discount'] else 0 
+        discount=float(request.form['discount']) if request.form['discount'] else 0
         stock=request.form['stock']
         total=float(price-((price*discount)/100))
         cate_id=request.form['category']
@@ -220,8 +220,8 @@ def product():
         conn.commit()
         return redirect('/admin/product')
     cursor.execute("""
-        SELECT p.pro_id, p.pro_name, p.price, p.discount, p.total, p.stock, p.status, p.image, 
-               p.created_at, p.updated_at, u.username, c.name as category_name
+        SELECT p.pro_id, p.pro_name, p.price, p.discount, p.total, p.stock, p.status, p.image,
+               p.created_at, p.updated_at, u.username, c.cate_id, c.name as category_name
         FROM product p
         INNER JOIN user u ON p.user_id = u.user_id
         INNER JOIN category c ON p.cate_id = c.cate_id
